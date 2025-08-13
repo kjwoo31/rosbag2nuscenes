@@ -5,7 +5,6 @@
 
 #include <cstring>
 #include "MessageTypes.hpp"
-#include "delphi_esr_msgs/msg/esr_track.hpp"
 #include "sensor_msgs/msg/point_cloud2.hpp"
 #include "sensor_msgs/msg/compressed_image.hpp"
 #include "sensor_msgs/msg/camera_info.hpp"
@@ -19,8 +18,6 @@
 class MessageConverter {
     public:
         MessageConverter();
-
-        RadarMessageT* getRadarMessage();
         
         LidarMessageT* getLidarMessage();
 
@@ -36,7 +33,6 @@ class MessageConverter {
         RadarMessageT* getLastRadarMessage();
 
     private:
-        delphi_esr_msgs::msg::EsrTrack radar_ros_msg_;
         sensor_msgs::msg::PointCloud2 lidar_ros_msg_;
         sensor_msgs::msg::CompressedImage camera_ros_msg_;
         sensor_msgs::msg::CameraInfo camera_info_ros_msg_;

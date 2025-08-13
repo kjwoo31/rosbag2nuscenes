@@ -1,0 +1,39 @@
+BAG_INFO:
+  TEAM: ROBOTIS
+  DESCRIPTION: GAEMI-1
+  ODOM_TOPIC: /sensors/odom
+  TRACK: IMS
+  URDF: urdf/gaemi1_G40.urdf
+SENSOR_INFO:
+  LIDAR_FRONT:
+    TOPIC: /slam/map/scan/laser_cloud
+    FRAME: G40/lidar_front_center_link
+  # LIDAR_LEFT:
+  #   TOPIC: /luminar_left_points
+  #   FRAME: luminar_left
+  # LIDAR_RIGHT:
+  #   TOPIC: /luminar_right_points
+  #   FRAME: luminar_right
+  CAMERA_FRONT_LEFT:
+    TOPIC: /sensor/camera/v4l2_driver/front_view/left/color/image_raw/compressed
+    FRAME: G40/camera_mono_left_link
+    CALIB: /sensor/camera/v4l2_driver/left_camera_info_sensor_msg
+  CAMERA_FRONT_LEFT_CENTER:
+    TOPIC: /sensor/camera/v4l2_driver/front_view/front_left/color/image_raw/compressed
+    FRAME: G40/camera_mono_front_left_link
+    CALIB: /sensor/camera/v4l2_driver/front_left_camera_info_sensor_msg
+  CAMERA_FRONT_RIGHT:
+    TOPIC: /sensor/camera/v4l2_driver/front_view/right/color/image_raw/compressed
+    FRAME: G40/camera_mono_right_link
+    CALIB: /sensor/camera/v4l2_driver/right_camera_info_sensor_msg
+  # CAMERA_REAR_LEFT:
+  #   TOPIC: /camera/rear_left/image/compressed
+  #   FRAME: camera_rear_left
+  #   CALIB: /camera/rear_left/camera_info
+  CAMERA_REAR:
+    TOPIC: /sensor/camera/realsense/rear_view/back/color/image_raw/compressed
+    FRAME: G40/camera_stereo_back_rgb_link
+    CALIB: /sensor/camera/realsense/back_camera_info_sensor_msg
+  # RADAR_FRONT:
+  #   TOPIC: /radar_front/esr_track
+  #   FRAME: radar_front

@@ -118,12 +118,14 @@ void Bag2Scenes::writeScene() {
         scenes = nlohmann::json::parse(scene_in);
         scene_in.close();
     }
-    // Write odometry data
-    std::thread ego_pose_thread(&Bag2Scenes::writeEgoPose, this, std::ref(ego_poses));
-    // Write sensor data
-    std::thread sensor_data_thread(&Bag2Scenes::writeSampleData, this, std::ref(sample_data));
-    ego_pose_thread.join();
-    sensor_data_thread.join();
+    // // Write odometry data
+    // std::thread ego_pose_thread(&Bag2Scenes::writeEgoPose, this, std::ref(ego_poses));
+    // // Write sensor data
+    // std::thread sensor_data_thread(&Bag2Scenes::writeSampleData, this, std::ref(sample_data));
+    // ego_pose_thread.join();
+    // sensor_data_thread.join();
+    writeEgoPose(ego_poses);
+    writeSampleData(sample_data);
     std::cout << "Writing Files..." << std::endl;
     std::ofstream ego_poses_out(output_dir_ / "v1.0-mini/ego_pose.json");
     ego_poses_out << ego_poses.dump(4) << std::endl;
@@ -245,26 +247,7 @@ void Bag2Scenes::writeSampleData(nlohmann::json& previous_data) {
                 continue;
             }
             nlohmann::json sample_data;
-            if (msg_type ==  "delphi_esr_msgs/msg/EsrTrack") {
-                RadarMessageT* radar_message = message_converter.getRadarMessage();
-                if (!radar_message) continue; // Only needed if batching radar messages
-                if (calibrated_sensors.find(serialized_message->topic_name) == calibrated_sensors.end()) {
-                    writeCalibratedSensor(radar_message->frame_id, std::vector<std::vector<float>>());
-                    calibrated_sensors.insert({serialized_message->topic_name});
-                }
-                filename = getFilename(radar_message->frame_id, radar_message->timestamp);
-                sample_data["token"] = frame_info_[radar_message->frame_id]["next_token"].as<std::string>();
-                sample_data["calibrated_sensor_token"] = frame_info_[radar_message->frame_id]["sensor_token"].as<std::string>();
-                sample_data["ego_pose_token"] = getClosestEgoPose(radar_message->timestamp);
-                sample_data["height"] = 0;
-                sample_data["width"] = 0;
-                sample_data["timestamp"] = ((double)radar_message->timestamp) * pow(10, -8);
-                sample_data["prev"] = frame_info_[radar_message->frame_id]["previous_token"].as<std::string>();
-                frame_info_[radar_message->frame_id]["previous_token"] = frame_info_[radar_message->frame_id]["next_token"].as<std::string>();
-                frame_info_[radar_message->frame_id]["next_token"] = generateToken();
-                sample_data["next"] = frame_info_[radar_message->frame_id]["next_token"].as<std::string>();
-                data_writer.writeSensorData(radar_message, filename);
-            } else if (msg_type == "sensor_msgs/msg/CompressedImage") {
+            if (msg_type == "sensor_msgs/msg/CompressedImage") {
                 CameraMessageT* camera_message = message_converter.getCameraMessage();
                 filename = getFilename(camera_message->frame_id, camera_message->timestamp);
                 sample_data["token"] = frame_info_[camera_message->frame_id]["next_token"].as<std::string>();
@@ -315,28 +298,28 @@ void Bag2Scenes::writeSampleData(nlohmann::json& previous_data) {
             previous_data.push_back(sample_data);
         }
     }
-    // ******** Only needed if batching radar messages ******** //
-    nlohmann::json sample_data;
-    RadarMessageT* radar_message = message_converter.getLastRadarMessage();
-    filename = getFilename(radar_message->frame_id, radar_message->timestamp);
-    sample_data["token"] = frame_info_[radar_message->frame_id]["next_token"].as<std::string>();
-    sample_data["calibrated_sensor_token"] = frame_info_[radar_message->frame_id]["sensor_token"].as<std::string>();
-    sample_data["ego_pose_token"] = getClosestEgoPose(radar_message->timestamp);
-    sample_data["height"] = 0;
-    sample_data["width"] = 0;
-    sample_data["timestamp"] = ((double)radar_message->timestamp) * pow(10, -8);
-    sample_data["prev"] = frame_info_[radar_message->frame_id]["previous_token"].as<std::string>();
-    frame_info_[radar_message->frame_id]["previous_token"] = frame_info_[radar_message->frame_id]["next_token"].as<std::string>();
-    frame_info_[radar_message->frame_id]["next_token"] = generateToken();
-    sample_data["next"] = frame_info_[radar_message->frame_id]["next_token"].as<std::string>();
-    data_writer.writeSensorData(radar_message, filename);
-    sample_data["sample_token"] = current_sample_token_;
-    filename_str = filename.u8string();
-    sample_data["filename"] = filename_str;
-    sample_data["fileformat"] = filename_str.substr(filename_str.find('.')+1);
-    sample_data["is_key_frame"] = (bool) (filename_str.find("samples") != std::string::npos);
-    previous_data.push_back(sample_data);
-    //  ******************************************************* //
+    // // ******** Only needed if batching radar messages ******** //
+    // nlohmann::json sample_data;
+    // RadarMessageT* radar_message = message_converter.getLastRadarMessage();
+    // filename = getFilename(radar_message->frame_id, radar_message->timestamp);
+    // sample_data["token"] = frame_info_[radar_message->frame_id]["next_token"].as<std::string>();
+    // sample_data["calibrated_sensor_token"] = frame_info_[radar_message->frame_id]["sensor_token"].as<std::string>();
+    // sample_data["ego_pose_token"] = getClosestEgoPose(radar_message->timestamp);
+    // sample_data["height"] = 0;
+    // sample_data["width"] = 0;
+    // sample_data["timestamp"] = ((double)radar_message->timestamp) * pow(10, -8);
+    // sample_data["prev"] = frame_info_[radar_message->frame_id]["previous_token"].as<std::string>();
+    // frame_info_[radar_message->frame_id]["previous_token"] = frame_info_[radar_message->frame_id]["next_token"].as<std::string>();
+    // frame_info_[radar_message->frame_id]["next_token"] = generateToken();
+    // sample_data["next"] = frame_info_[radar_message->frame_id]["next_token"].as<std::string>();
+    // data_writer.writeSensorData(radar_message, filename);
+    // sample_data["sample_token"] = current_sample_token_;
+    // filename_str = filename.u8string();
+    // sample_data["filename"] = filename_str;
+    // sample_data["fileformat"] = filename_str.substr(filename_str.find('.')+1);
+    // sample_data["is_key_frame"] = (bool) (filename_str.find("samples") != std::string::npos);
+    // previous_data.push_back(sample_data);
+    // //  ******************************************************* //
     data_writer.close();
 }
 
