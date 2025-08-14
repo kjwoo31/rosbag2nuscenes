@@ -16,7 +16,7 @@ This codebase converts ROS2 bag files to the nuScenes dataset format. The conver
 The library currently has delphi_esr_msgs as a dependency, found [here](https://github.com/astuff/astuff_sensor_msgs). This is listed as a dependency because the radar messages used for developing the library were of type `delphi_esr_msgs/msg/EsrTrack`. If you are using a different radar message type, this dependency can be removed with changes to `src/MessageConverter.cpp:convertRadarMessage()`.
 
 ```
-git clone --recurse-submodules https://github.com/linklab-uva/rosbag2nuscenes.git && cd rosbag2nuscenes/
+git clone --recurse-submodules https://github.com/kjwoo31/rosbag2nuscenes.git && cd rosbag2nuscenes/
 mkdir build/ && cd build/
 cmake ..
 make
