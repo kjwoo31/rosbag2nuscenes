@@ -5,7 +5,7 @@ BAG_INFO:
   TRACK: IMS
   URDF: urdf/gaemi1_G40.urdf
 SENSOR_INFO:
-  LIDAR_FRONT:
+  LIDAR_TOP:
     TOPIC: /slam/map/scan/laser_cloud
     FRAME: G40/lidar_front_center_link
   # LIDAR_LEFT:
